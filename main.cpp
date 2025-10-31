@@ -31,8 +31,30 @@ int main (void)
     GraphDump(&lst, NoArg, __FUNCTION__, __FILE__, __LINE__);
     InsertToHead(&lst, 5);
     GraphDump(&lst, NoArg, __FUNCTION__, __FILE__, __LINE__);
-    InsertToTail(&lst, 6);
+    DeleteEl(&lst, (lst.prev)[0]);
     GraphDump(&lst, NoArg, __FUNCTION__, __FILE__, __LINE__);
+    /*InsertToTail(&lst, 6);
+    GraphDump(&lst, NoArg, __FUNCTION__, __FILE__, __LINE__);
+    InsertToHead(&lst, 5);
+    GraphDump(&lst, NoArg, __FUNCTION__, __FILE__, __LINE__);
+    InsertToHead(&lst, 5);
+    GraphDump(&lst, NoArg, __FUNCTION__, __FILE__, __LINE__);
+    InsertToHead(&lst, 5);
+    GraphDump(&lst, NoArg, __FUNCTION__, __FILE__, __LINE__);
+    InsertToHead(&lst, 5);
+    GraphDump(&lst, NoArg, __FUNCTION__, __FILE__, __LINE__);
+    InsertToHead(&lst, 5);
+    GraphDump(&lst, NoArg, __FUNCTION__, __FILE__, __LINE__);
+    InsertToHead(&lst, 5);
+    GraphDump(&lst, NoArg, __FUNCTION__, __FILE__, __LINE__);
+    InsertToHead(&lst, 5);
+    GraphDump(&lst, NoArg, __FUNCTION__, __FILE__, __LINE__);
+    InsertToHead(&lst, 5);
+    GraphDump(&lst, NoArg, __FUNCTION__, __FILE__, __LINE__);
+    InsertToHead(&lst, 5);
+    GraphDump(&lst, NoArg, __FUNCTION__, __FILE__, __LINE__);
+    InsertToHead(&lst, 5);
+    GraphDump(&lst, NoArg, __FUNCTION__, __FILE__, __LINE__);*/
 
     fclose(fp);
     ListDtor(&lst);
