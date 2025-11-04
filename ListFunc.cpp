@@ -5,14 +5,14 @@
 
 #include "Data.h"
 
-ListErr_t ListCtor (List_t * lst, FILE * fp)
+int ListCtor (List_t * lst, FILE * fp)
 {
     assert(lst);
     assert(fp);
 
-    lst->data = (int *)    calloc (START_SIZE, sizeof(int)); //func
-    lst->next = (int *)    calloc (START_SIZE, sizeof(int));
-    lst->prev = (int *)    calloc (START_SIZE, sizeof(int));
+    lst->data = (int *) calloc (START_SIZE, sizeof(int)); //func
+    lst->next = (int *) calloc (START_SIZE, sizeof(int));
+    lst->prev = (int *) calloc (START_SIZE, sizeof(int));
 
     lst->log = fp;                  // logfile
 
@@ -27,17 +27,17 @@ ListErr_t ListCtor (List_t * lst, FILE * fp)
     FillNextWithFreeAddresses(lst, 1);
     FillPrevWithStartValue(lst, 1);
 
-    LIST_VERIFY(lst, After);
+    LIST_VERIFY(lst, After, 0, 0); // fix
 
     return NoError;
 }
 
 
-ListErr_t ListVerify (List_t * lst)
+int ListVerify (List_t * lst)
 {
     assert(lst);
 
-    ListErr_t error = NoError;
+    int error = NoError;
 
     if ((error = CheckNullPointers(lst)) != NoError)
         return error;
@@ -54,7 +54,7 @@ ListErr_t ListVerify (List_t * lst)
 }
 
 
-ListErr_t GraphDump(List_t * lst, Place_t place, const char * func_name, const char * file_name, int num_of_line)
+ListErr_t GraphDump (List_t * lst, Place_t place, const char * func_name, const char * file_name, int num_of_line, int addr, int elem, int result)
 {
     assert(lst);
     assert(func_name);
@@ -70,7 +70,7 @@ ListErr_t GraphDump(List_t * lst, Place_t place, const char * func_name, const c
     system(command); // FIXME: check return value
     free(command);
 
-    OutputTitle(log, place_of_call, func_name, file_name, num_of_line);
+    OutputTitle(log, place_of_call, func_name, file_name, num_of_line, addr, elem, result);
     OutputIndexes(log, lst);
     OutputData(log, lst);
     OutputNext(log, lst);
@@ -93,7 +93,7 @@ void MakeGraphCodeFile (List_t * lst)
     OutputNullCell         (fp, lst);
     OutputArrayCellsNodes  (fp, lst);
     OutputHeadAndTailNodes (fp, lst);
-    OutputInvisEdges       (fp, lst);
+    OutputAllEdges         (fp, lst);
     OutputArrayCellsEdges  (fp, lst);
     OutputHeadAndTailEdges (fp, lst);
 
@@ -106,9 +106,9 @@ ListErr_t ListRealloc (List_t * lst)
     assert(lst);
 
     lst->capacity *= 2;
-    lst->data = (int    *) realloc (lst->data, ((size_t) lst->capacity * sizeof(int)));
-    lst->next = (int    *) realloc (lst->next, ((size_t) lst->capacity * sizeof(int)));
-    lst->prev = (int    *) realloc (lst->prev, ((size_t) lst->capacity * sizeof(int)));
+    lst->data = (int *) realloc (lst->data, ((size_t) lst->capacity * sizeof(int)));
+    lst->next = (int *) realloc (lst->next, ((size_t) lst->capacity * sizeof(int)));
+    lst->prev = (int *) realloc (lst->prev, ((size_t) lst->capacity * sizeof(int)));
 
     if (lst->data == NULL || lst->next == NULL || lst->prev == NULL)
         return MemAllocError;

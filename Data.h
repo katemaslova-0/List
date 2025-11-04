@@ -8,13 +8,13 @@ const int SIZE_OF_PIC_NAME = 80;
 const int SIZE_OF_COMMAND = 80;
 const int FREE_ADDRESS_INDICATOR = -1;
 
-#define LIST_VERIFY(lst, place) if (ListVerify(lst) != NoError) \
-                                {printf("ListDump at %s:%d\n", __FILE__, __LINE__); \
-                                ListErr_t error = ListVerify(lst); \
-                                OutputErrorCode(error); \
-                                GraphDump(lst, place, __FUNCTION__, __FILE__, __LINE__); \
-                                return error;}
-
+#define LIST_VERIFY(lst, place, addr, elem) if (ListVerify(lst) != NoError) \
+                                      {printf("ListDump at %s:%d\n", __FILE__, __LINE__); \
+                                      int error = ListVerify(lst); \
+                                      OutputErrorCode(error); \
+                                      GraphDump(lst, place, __FUNCTION__, __FILE__, __LINE__, addr, elem, ERROR); \
+                                      return error;} \
+                                      GraphDump(lst, place, __FUNCTION__, __FILE__, __LINE__, addr, elem, SUCCESS);
 struct List_t
 {
     int * data;
@@ -23,6 +23,12 @@ struct List_t
     int free;
     int capacity;
     FILE * log;
+};
+
+enum Dump_t
+{
+    SUCCESS = 0,
+    ERROR   = 1
 };
 
 enum ListErr_t
@@ -58,12 +64,11 @@ enum Place_t
 };
 
 /*List functions*/
-ListErr_t ListCtor       (List_t * lst, FILE * fp);
-ListErr_t ListVerify     (List_t * lst);
+int ListCtor             (List_t * lst, FILE * fp);
+int ListVerify           (List_t * lst);
 void ListDtor            (List_t * lst);
 void MakeGraphCodeFile   (List_t * lst);
-ListErr_t FileDump       (List_t * lst);
-ListErr_t GraphDump      (List_t * lst, Place_t place, const char * func_name, const char * file_name, int num_of_line);
+ListErr_t GraphDump      (List_t * lst, Place_t place, const char * func_name, const char * file_name, int num_of_line, int addr, int elem, int result);
 ListErr_t ListRealloc    (List_t * lst);
 
 /*Insert, Delete*/
@@ -71,7 +76,7 @@ int InsertAfter          (List_t * lst, int addr_of_el_before, int elem);
 int InsertBefore         (List_t * lst, int addr_of_el_after, int elem);
 int InsertToHead         (List_t * lst, int elem);
 int InsertToTail         (List_t * lst, int elem);
-ListErr_t DeleteEl       (List_t * lst, int addr_of_el);
+int DeleteEl             (List_t * lst, int addr_of_el);
 
 /*Fill arrays with start values*/
 void FillDataWithPoison        (List_t * lst, int start);
@@ -90,8 +95,6 @@ int PutElemToData                     (List_t * lst, int elem);
 ListErr_t CheckIfAddressValid         (List_t * lst, int address);
 ListErr_t CheckIfElemBeforeExist      (List_t * lst, int address);
 ListErr_t CallReallocIfNeed           (List_t * lst);
-void ChangeNextsAndPrevsAfterInsert   (List_t * lst, int data_pos, int addr_of_el_before);
-void ChangeNextsAndPrevsAfterDelete   (List_t * lst, int addr_of_el);
 
 /*Inside functions for ListVerify*/
 ListErr_t CheckNullPointers           (List_t * lst);
@@ -104,12 +107,12 @@ ListErr_t CheckIfCycles               (List_t * lst);
 void OutputNullCell         (FILE * fp, List_t * lst);
 void OutputArrayCellsNodes  (FILE * fp, List_t * lst);
 void OutputHeadAndTailNodes (FILE * fp, List_t * lst);
-void OutputInvisEdges       (FILE * fp, List_t * lst);
+void OutputAllEdges         (FILE * fp, List_t * lst);
 void OutputArrayCellsEdges  (FILE * fp, List_t * lst);
 void OutputHeadAndTailEdges (FILE * fp, List_t * lst);
 
 /*Output functions for ListDump*/
-void OutputTitle   (FILE * log, const char * place, const char * func_name, const char * file_name, int num_of_line);
+void OutputTitle   (FILE * log, const char * place, const char * func_name, const char * file_name, int num_of_line, int addr, int elem, int result);
 void OutputIndexes (FILE * log, List_t * lst);
 void OutputData    (FILE * log, List_t * lst);
 void OutputNext    (FILE * log, List_t * lst);
@@ -118,6 +121,6 @@ void OutputFree    (FILE * log, List_t * lst);
 void OutputImage   (FILE * log, List_t * lst, char * pic_name);
 
 /*Error messages*/
-void OutputErrorCode                  (ListErr_t error);
+void OutputErrorCode (int error);
 
 #endif // DATA_H

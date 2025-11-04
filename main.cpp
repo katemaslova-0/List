@@ -2,6 +2,8 @@
 
 #include "Data.h"
 
+#define OUTPUT_ERROR_AND_FINISH {OutputErrorCode(res); ListDtor(&lst); return -1;}
+
 int main (void)
 {
     List_t lst = {};
@@ -21,40 +23,20 @@ int main (void)
         return -1;
     }
 
-    InsertAfter(&lst, 0, 1);
-    GraphDump(&lst, NoArg, __FUNCTION__, __FILE__, __LINE__);
-    InsertAfter(&lst, 1, 2);
-    GraphDump(&lst, NoArg, __FUNCTION__, __FILE__, __LINE__);
-    InsertBefore(&lst, (lst.next)[0], 3);
-    GraphDump(&lst, NoArg, __FUNCTION__, __FILE__, __LINE__);
-    InsertBefore(&lst, (lst.next)[0], 4);
-    GraphDump(&lst, NoArg, __FUNCTION__, __FILE__, __LINE__);
-    InsertToHead(&lst, 5);
-    GraphDump(&lst, NoArg, __FUNCTION__, __FILE__, __LINE__);
-    DeleteEl(&lst, (lst.prev)[0]);
-    GraphDump(&lst, NoArg, __FUNCTION__, __FILE__, __LINE__);
-    /*InsertToTail(&lst, 6);
-    GraphDump(&lst, NoArg, __FUNCTION__, __FILE__, __LINE__);
-    InsertToHead(&lst, 5);
-    GraphDump(&lst, NoArg, __FUNCTION__, __FILE__, __LINE__);
-    InsertToHead(&lst, 5);
-    GraphDump(&lst, NoArg, __FUNCTION__, __FILE__, __LINE__);
-    InsertToHead(&lst, 5);
-    GraphDump(&lst, NoArg, __FUNCTION__, __FILE__, __LINE__);
-    InsertToHead(&lst, 5);
-    GraphDump(&lst, NoArg, __FUNCTION__, __FILE__, __LINE__);
-    InsertToHead(&lst, 5);
-    GraphDump(&lst, NoArg, __FUNCTION__, __FILE__, __LINE__);
-    InsertToHead(&lst, 5);
-    GraphDump(&lst, NoArg, __FUNCTION__, __FILE__, __LINE__);
-    InsertToHead(&lst, 5);
-    GraphDump(&lst, NoArg, __FUNCTION__, __FILE__, __LINE__);
-    InsertToHead(&lst, 5);
-    GraphDump(&lst, NoArg, __FUNCTION__, __FILE__, __LINE__);
-    InsertToHead(&lst, 5);
-    GraphDump(&lst, NoArg, __FUNCTION__, __FILE__, __LINE__);
-    InsertToHead(&lst, 5);
-    GraphDump(&lst, NoArg, __FUNCTION__, __FILE__, __LINE__);*/
+    int res = NoError;
+    if ((res = InsertAfter(&lst, 0, 10)) < 0)
+        OUTPUT_ERROR_AND_FINISH;
+    if ((res = InsertAfter(&lst, 1, 20)) < 0)
+        OUTPUT_ERROR_AND_FINISH;
+    if ((res = InsertBefore(&lst, (lst.next)[0], 30)) < 0)
+        OUTPUT_ERROR_AND_FINISH;
+    if ((res = InsertBefore(&lst, (lst.next)[0], 40)) < 0)
+        OUTPUT_ERROR_AND_FINISH;
+    if ((res = DeleteEl(&lst, (lst.prev)[0])) != NoError)
+        OUTPUT_ERROR_AND_FINISH;
+    (lst.next)[(lst.prev[0])] = 300;
+    if ((res = InsertAfter(&lst, 0, 50)) < 0)
+        OUTPUT_ERROR_AND_FINISH;
 
     fclose(fp);
     ListDtor(&lst);

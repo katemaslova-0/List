@@ -10,7 +10,7 @@ int InsertAfter (List_t * lst, int addr_of_el_before, int elem)
 {
     assert(lst);
 
-    LIST_VERIFY(lst, Before); // is assert needed?
+    LIST_VERIFY(lst, Before, addr_of_el_before, elem); // is assert needed?
 
     if (CheckIfAddressValid(lst, addr_of_el_before) != NoError)
         return InvalidElemAddr;
@@ -19,14 +19,15 @@ int InsertAfter (List_t * lst, int addr_of_el_before, int elem)
         return ElemDoesNotExist;
 
     if (CallReallocIfNeed(lst) != NoError)
-    {
         return MemAllocError;
-    }
 
     int data_pos = PutElemToData(lst, elem);
-    ChangeNextsAndPrevsAfterInsert(lst, data_pos, addr_of_el_before);
+    (lst->next)[data_pos] = (lst->next)[addr_of_el_before]; // setting new next's and prev's
+    (lst->prev)[(lst->next)[addr_of_el_before]] = data_pos;
+    (lst->next)[addr_of_el_before] = data_pos;
+    (lst->prev)[data_pos] = addr_of_el_before;
 
-    LIST_VERIFY(lst, After);
+    LIST_VERIFY(lst, After, addr_of_el_before, elem);
 
     return data_pos;
 }
@@ -36,11 +37,11 @@ int InsertBefore (List_t * lst, int addr_of_el_after, int elem)
 {
     assert(lst);
 
-    LIST_VERIFY(lst, Before);
+    LIST_VERIFY(lst, Before, addr_of_el_after, elem);
 
     int pos = InsertAfter(lst, (lst->prev)[addr_of_el_after], elem);
 
-    LIST_VERIFY(lst, After);
+    LIST_VERIFY(lst, After, addr_of_el_after, elem);
 
     return pos;
 }
@@ -50,11 +51,11 @@ int InsertToHead (List_t * lst, int elem)
 {
     assert(lst);
 
-    LIST_VERIFY(lst, Before);
+    LIST_VERIFY(lst, Before, (lst->next)[0], elem);
 
     int pos = InsertBefore(lst, (lst->next)[0], elem);
 
-    LIST_VERIFY(lst, After);
+    LIST_VERIFY(lst, After, (lst->next)[0], elem);
 
     return pos;
 }
@@ -64,29 +65,36 @@ int InsertToTail (List_t * lst, int elem)
 {
     assert(lst);
 
-    LIST_VERIFY(lst, Before);
+    LIST_VERIFY(lst, Before, elem, elem);
 
     int pos = InsertAfter(lst, (lst->prev)[0], elem);
 
-    LIST_VERIFY(lst, After);
+    LIST_VERIFY(lst, After, elem, elem);
 
     return pos;
 }
 
 
-ListErr_t DeleteEl (List_t * lst, int addr_of_el)
+int DeleteEl (List_t * lst, int addr_of_el)
 {
     assert(lst);
 
-    LIST_VERIFY(lst, Before);
+    int deleted_elem = lst->data[addr_of_el];
+    LIST_VERIFY(lst, Before, addr_of_el, deleted_elem);
 
     if (CheckIfElemBeforeExist(lst, addr_of_el) != NoError)
         return ElemDoesNotExist;
 
     (lst->data)[addr_of_el] = POISON;
-    ChangeNextsAndPrevsAfterDelete(lst, addr_of_el);
+    (lst->next)[(lst->prev)[addr_of_el]] = (lst->next)[addr_of_el]; // changing next value for the prev el
+    (lst->prev)[(lst->next)[addr_of_el]] = (lst->prev)[addr_of_el]; // changing prev value for the next el
 
-    LIST_VERIFY(lst, After);
+    (lst->next)[addr_of_el] = lst->free; // writing the next free address (= value of free) in
+    lst->free = addr_of_el;              // changing free value (to current data pos)
+
+    (lst->prev)[addr_of_el] = FREE_ADDRESS_INDICATOR;
+
+    LIST_VERIFY(lst, After, addr_of_el, deleted_elem);
 
     return NoError;
 }
@@ -125,17 +133,6 @@ ListErr_t CheckIfAddressValid (List_t * lst, int address)
         return InvalidElemAddr;
 
     return NoError;
-}
-
-
-void ChangeNextsAndPrevsAfterInsert (List_t * lst, int data_pos, int addr_of_el_before)
-{
-    assert(lst);
-
-    (lst->next)[data_pos] = (lst->next)[addr_of_el_before]; // setting new next's and prev's
-    (lst->prev)[(lst->next)[addr_of_el_before]] = data_pos;
-    (lst->next)[addr_of_el_before] = data_pos;
-    (lst->prev)[data_pos] = addr_of_el_before;
 }
 
 

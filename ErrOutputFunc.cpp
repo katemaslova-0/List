@@ -3,7 +3,7 @@
 #include "Data.h"
 
 
-void OutputErrorCode (ListErr_t error)
+void OutputErrorCode (int error)
 {
     switch (error)
     {
